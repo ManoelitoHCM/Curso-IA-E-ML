@@ -1,12 +1,12 @@
 import pandas as pd
+import graphviz
 from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
-from yellowbrick.classifier import ConfusionMatrix
 
 #importando os dados da planilha e eliminando 1a coluna com dados irrelevantes
-base = pd.read_csv('insurance.csv')
+base = pd.read_csv(r'C:\Users\manoe\OneDrive\Documentos\Workspace\Curso IA E ML\Algoritmos Machine Learning\insurance.csv')
 base = base.drop(columns=['Unnamed: 0'])
 
 print(base)
@@ -33,7 +33,7 @@ y = labelencoder.fit_transform(y)
 x_treinamento, x_teste, y_treinamento, y_teste = train_test_split(x, y, test_size=0.3, random_state=0)
 
 #criação do modelo
-modelo = GaussianNB()
+modelo = DecisionTreeClassifier(random_state=1, max_depth=6, max_leaf_nodes=10)
 
 #atribuição das colunas de treinamento ao modelo
 modelo.fit(x_treinamento, y_treinamento)
@@ -48,14 +48,12 @@ f1 = f1_score(y_teste, previsao, average='weighted')
 
 print(f'Acuracia: {accuracy}, Precisao: {precision}, Recall: {recall}, F1: {f1}')
 
+dot_data = export_graphviz(modelo, out_file=None, filled=True, feature_names=base.columns[:-1], class_names=True, rounded=True)
+
+graph = graphviz.Source(dot_data)
+graph.render("Decision_tree", format="png")
+
 #relatorio de classificação exibindo as métricas em detalhes
-report = classification_report(y_teste, previsao)
+#report = classification_report(y_teste, previsao)
 
-print(report)
-
-confusao = ConfusionMatrix(modelo, classes=['None', 'Severe', 'Mild', 'Moderate'])
-confusao.fit(x_treinamento, y_treinamento)
-
-confusao.score(x_teste, y_teste)
-
-confusao.poof()
+#print(report)
