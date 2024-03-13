@@ -1,9 +1,11 @@
-import graphviz
+import matplotlib.pyplot as plt
 import pandas as pd
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.tree import DecisionTreeClassifier, export_graphviz
+# import graphviz
+from sklearn.tree import plot_tree
 
 # importando os dados da planilha e eliminando 1.ª coluna com dados irrelevantes
 base = pd.read_csv(
@@ -34,10 +36,17 @@ y = labelencoder.fit_transform(y)
 x_treinamento, x_teste, y_treinamento, y_teste = train_test_split(x, y, test_size=0.3, random_state=0)
 
 # criação do modelo
-modelo = DecisionTreeClassifier(random_state=1, max_depth=6, max_leaf_nodes=10)
+modelo = RandomForestClassifier(random_state=1, n_estimators=100, max_depth=8, max_leaf_nodes=8)
 
 # atribuição das colunas de treinamento ao modelo
 modelo.fit(x_treinamento, y_treinamento)
+
+# impressão
+tree_index = 0
+tree_to_visualize = modelo.estimators_[tree_index]
+plt.figure(figsize=(20, 10))
+plot_tree(tree_to_visualize, filled=True, feature_names=base.columns[:-1], class_names=True, rounded=True)
+plt.show()
 
 y_predict = modelo.predict(x_teste)
 
@@ -49,13 +58,7 @@ f1 = f1_score(y_teste, y_predict, average='weighted')
 
 print(f'Acurácia: {accuracy}, Precisão: {precision}, Recall: {recall}, F1: {f1}')
 
-dot_data = export_graphviz(modelo, out_file=None, filled=True, feature_names=base.columns[:-1], class_names=True,
-                           rounded=True)
-
-graph = graphviz.Source(dot_data)
-graph.render("Decision_tree", format="png")
-
 # relatorio de classificação exibindo as métricas em detalhes
-# report = classification_report(y_teste, previsao)
+report = classification_report(y_teste, y_predict)
 
-# print(report)
+print(report)
