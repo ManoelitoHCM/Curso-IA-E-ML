@@ -12,8 +12,6 @@ base = pd.read_csv(
     r'C:\Users\manoe\OneDrive\Documentos\Workspace\Curso IA E ML\Algoritmos Machine Learning\insurance.csv')
 base = base.drop(columns=['Unnamed: 0'])
 
-print(base)
-
 # atribuição da coluna que será prevista a y (variável dependente)
 y = base.iloc[:, 7].values
 
@@ -41,12 +39,13 @@ modelo = RandomForestClassifier(random_state=1, n_estimators=100, max_depth=8, m
 # atribuição das colunas de treinamento ao modelo
 modelo.fit(x_treinamento, y_treinamento)
 
-# impressão
-tree_index = 0
-tree_to_visualize = modelo.estimators_[tree_index]
-plt.figure(figsize=(20, 10))
-plot_tree(tree_to_visualize, filled=True, feature_names=base.columns[:-1], class_names=True, rounded=True)
-plt.show()
+for index in range(5):
+    # impressão
+    tree_index = index
+    tree_to_visualize = modelo.estimators_[tree_index]
+    plt.figure(figsize=(20, 10))
+    plot_tree(tree_to_visualize, filled=True, feature_names=base.columns[:-1], class_names=True, rounded=True)
+    plt.show()
 
 y_predict = modelo.predict(x_teste)
 
@@ -56,9 +55,14 @@ precision = precision_score(y_teste, y_predict, average='weighted')
 recall = recall_score(y_teste, y_predict, average='weighted')
 f1 = f1_score(y_teste, y_predict, average='weighted')
 
-print(f'Acurácia: {accuracy}, Precisão: {precision}, Recall: {recall}, F1: {f1}')
 
 # relatorio de classificação exibindo as métricas em detalhes
 report = classification_report(y_teste, y_predict)
 
-print(report)
+
+if __name__ == '__main__':
+    print(base)
+
+    print(f'Acurácia: {accuracy}, Precisão: {precision}, Recall: {recall}, F1: {f1}')
+
+    print(report)
